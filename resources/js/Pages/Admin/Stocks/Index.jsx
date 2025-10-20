@@ -6,6 +6,7 @@ import { router } from '@inertiajs/react';
 export default function StocksIndex({ auth, stocks, flash }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredStocks, setFilteredStocks] = useState(stocks);
+  const [adjustValues, setAdjustValues] = useState({});
 
   useEffect(() => {
     setFilteredStocks(
@@ -16,11 +17,27 @@ export default function StocksIndex({ auth, stocks, flash }) {
     );
   }, [searchTerm, stocks]);
 
-  const handleAdjust = (id, change) => {
+  const handleAdjustChange = (id, value) => {
+    setAdjustValues(prev => ({
+      ...prev,
+      [id]: value
+    }));
+  };
+
+  const handleAdjustSubmit = (id) => {
+    const change = parseInt(adjustValues[id] || 0);
+    if (change === 0) return;
+    
     router.post(route('admin.stocks.adjust', id), { 
       change: change,
       note: `Adjusted by ${change}` 
     });
+    
+    // Reset the input after submission
+    setAdjustValues(prev => ({
+      ...prev,
+      [id]: ''
+    }));
   };
 
   const handleDelete = (id) => {
@@ -93,19 +110,22 @@ export default function StocksIndex({ auth, stocks, flash }) {
                           <td className="px-6 py-4 whitespace-nowrap">{stock.min_quantity}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <div className="flex space-x-2">
-                              <button
-                                onClick={() => handleAdjust(stock.id, 1)}
-                                className="text-white bg-green-600 hover:bg-green-700 px-2 py-1 rounded"
-                              >
-                                +1
-                              </button>
-                              <button
-                                onClick={() => handleAdjust(stock.id, -1)}
-                                className="text-white bg-yellow-600 hover:bg-yellow-700 px-2 py-1 rounded"
-                                disabled={stock.quantity <= 0}
-                              >
-                                -1
-                              </button>
+                              <div className="flex items-center space-x-1">
+                                <input
+                                  type="number"
+                                  value={adjustValues[stock.id] || ''}
+                                  onChange={(e) => handleAdjustChange(stock.id, e.target.value)}
+                                  className="w-16 px-2 py-1 border rounded text-sm"
+                                  placeholder="Jumlah"
+                                />
+                                <button
+                                  onClick={() => handleAdjustSubmit(stock.id)}
+                                  className="text-white bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded text-sm"
+                                  disabled={!adjustValues[stock.id]}
+                                >
+                                  Submit
+                                </button>
+                              </div>
                               <Link
                                 href={route('admin.stocks.edit', stock.id)}
                                 className="text-indigo-600 hover:text-indigo-900 px-2 py-1"
