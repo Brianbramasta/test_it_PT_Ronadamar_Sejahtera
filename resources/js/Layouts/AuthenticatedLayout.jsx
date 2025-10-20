@@ -24,6 +24,20 @@ export default function Authenticated({ user, header, children }) {
                                 <NavLink href={route('dashboard')} active={route().current('dashboard')}>
                                     Dashboard
                                 </NavLink>
+                                {user.is_admin ? (
+                                    <>
+                                    <NavLink href={route('admin.stocks')} active={route().current('admin.stocks')}>
+                                        Manajemen Stok
+                                    </NavLink>
+                                    <NavLink href={route('stock.report')} active={route().current('stock.report')}>
+                                        Laporan Stok
+                                    </NavLink>
+                                    </>
+                                ) : (
+                                    <NavLink href={route('stock.report')} active={route().current('stock.report')}>
+                                        Laporan Stok
+                                    </NavLink>
+                                )}
                             </div>
                         </div>
 
