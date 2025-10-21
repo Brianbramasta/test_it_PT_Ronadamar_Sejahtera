@@ -10,7 +10,7 @@ class PublicStockController extends Controller
     /**
      * Menampilkan daftar stok
      */
-    public function index() 
+    public function index()
     {
         return response()->json(Stock::orderBy('created_at','desc')->get());
     }
@@ -18,7 +18,7 @@ class PublicStockController extends Controller
     /**
      * Menampilkan detail stok
      */
-    public function show(Stock $stock) 
+    public function show(Stock $stock)
     {
         return response()->json($stock);
     }
@@ -26,7 +26,7 @@ class PublicStockController extends Controller
     /**
      * Membuat stok baru
      */
-    public function store(Request $request) 
+    public function store(Request $request)
     {
         $data = $request->validate([
             'sku' => 'nullable|string|unique:stocks,sku',
@@ -42,7 +42,7 @@ class PublicStockController extends Controller
     /**
      * Mengupdate stok
      */
-    public function update(Request $request, Stock $stock) 
+    public function update(Request $request, Stock $stock)
     {
         $data = $request->validate([
             'sku' => "nullable|string|unique:stocks,sku,{$stock->id}",
@@ -57,16 +57,16 @@ class PublicStockController extends Controller
     /**
      * Menghapus stok
      */
-    public function destroy(Stock $stock) 
+    public function destroy(Stock $stock)
     {
         $stock->delete();
-        return response()->json(null, 204);
+        return response()->json(['message' => 'Stok berhasil dihapus'], 200);
     }
 
     /**
      * Menambah atau mengurangi jumlah stok
      */
-    public function adjust(Request $request, Stock $stock) 
+    public function adjust(Request $request, Stock $stock)
     {
         $data = $request->validate([
             'change' => 'required|integer', // positif = tambah, negatif = kurangi
@@ -77,7 +77,7 @@ class PublicStockController extends Controller
         if ($newQty < 0) {
             return response()->json(['error' => 'Quantity cannot be negative'], 422);
         }
-        
+
         $stock->quantity = $newQty;
         $stock->save();
 
